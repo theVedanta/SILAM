@@ -1,6 +1,9 @@
 // https://silam.fmi.fi/AQ/operational/europe/AQ/000/AQI_005.png
 // tbranzov@math.bas.bg
 
+// Check the display state skipping
+// Flickering - partially fixed
+
 import {
     Box,
     Button,
@@ -18,10 +21,9 @@ import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
 import { IoReloadOutline } from "react-icons/io5";
 
 const Home = () => {
-    const [currentNum, setCurrentNum] = useState(1);
-    const [displayImg, setDisplayImg] = useState(0);
+    const [current, setCurrent] = useState(1);
     const [end, setEnd] = useState(false);
-    const toast = useToast();
+    const [display, setDisplay] = useState(0);
 
     const formatNum = (num) => {
         return num.toString().length === 1
@@ -31,165 +33,70 @@ const Home = () => {
             : num;
     };
 
-    const onError = () => {
-        setEnd(true);
-        if (!toast.isActive("err"))
-            toast({
-                title: "End of the line",
-                status: "error",
-                id: "err",
-            });
-    };
-
     useEffect(() => {
-        // INITIAL
-        if (displayImg === 0) {
-            if (currentNum % 4 === 0) {
-                return setDisplayImg(1);
-            }
-            // ACTUAL INCREMENT
-        } else setDisplayImg(displayImg === 5 ? 1 : displayImg + 1);
-    }, [currentNum]);
+        console.log(display);
+        if (display >= 4) {
+            setDisplay(0);
+            setCurrent(current + 5);
+        }
+    }, [display]);
 
     return (
         <>
             {end ? (
-                <Flex position="relative" p={10}>
-                    <Box position="fixed" top={0} left={0}>
+                <Flex position="relative">
+                    <Box
+                        position="fixed"
+                        top={0}
+                        left={0}
+                        width={800}
+                        height={1000}
+                    >
                         <Image
+                            priority
+                            loading="eager"
+                            src={`https://silam.fmi.fi/AQ/operational/europe/AQ/000/AQI_${formatNum(
+                                current - 1
+                            )}.png`}
                             width={800}
                             height={1000}
-                            src={`https://silam.fmi.fi/AQ/operational/europe/AQ/000/AQI_${formatNum(
-                                currentNum - 1
-                            )}.png`}
                             alt="display-img"
                         />
                     </Box>
                 </Flex>
             ) : (
-                <>
-                    {displayImg === -1 ? (
-                        window.location.reload()
-                    ) : (
-                        <Flex position="relative" p={10}>
-                            <Box
-                                position="fixed"
-                                top={0}
-                                left={0}
+                <Flex position="relative">
+                    {[0, 1, 2, 3, 4].map((i) => (
+                        <Flex
+                            position="fixed"
+                            top={0}
+                            left={0}
+                            width={800}
+                            height={1000}
+                            display={display === i ? "flex" : "none"}
+                            key={i}
+                            justifyContent="center"
+                            direction="column"
+                            alignItems="center"
+                        >
+                            <Image
+                                priority
+                                loading="eager"
+                                src={`https://silam.fmi.fi/AQ/operational/europe/AQ/000/AQI_${formatNum(
+                                    current + i
+                                )}.png`}
+                                onLoadingComplete={() => {
+                                    i >= display && setDisplay((d) => d + 1);
+                                    // article relates to
+                                }}
+                                onError={() => setEnd(true)}
                                 width={800}
                                 height={1000}
-                                opacity={displayImg === 1 ? 1 : 0}
-                            >
-                                <Image
-                                    priority
-                                    loading="eager"
-                                    src={`https://silam.fmi.fi/AQ/operational/europe/AQ/000/AQI_${formatNum(
-                                        currentNum
-                                    )}.png`}
-                                    onLoadingComplete={() =>
-                                        setCurrentNum(currentNum + 1)
-                                    }
-                                    onError={onError}
-                                    width={800}
-                                    height={1000}
-                                    alt="display-img"
-                                />
-                            </Box>
-                            <Box
-                                position="fixed"
-                                top={0}
-                                left={0}
-                                width={800}
-                                height={1000}
-                                opacity={displayImg === 2 ? 1 : 0}
-                            >
-                                <Image
-                                    priority
-                                    loading="eager"
-                                    src={`https://silam.fmi.fi/AQ/operational/europe/AQ/000/AQI_${formatNum(
-                                        currentNum
-                                    )}.png`}
-                                    onLoadingComplete={() =>
-                                        setCurrentNum(currentNum + 1)
-                                    }
-                                    onError={onError}
-                                    width={800}
-                                    height={1000}
-                                    alt="display-img"
-                                />
-                            </Box>
-                            <Box
-                                position="fixed"
-                                top={0}
-                                left={0}
-                                width={800}
-                                height={1000}
-                                opacity={displayImg === 3 ? 1 : 0}
-                            >
-                                <Image
-                                    priority
-                                    loading="eager"
-                                    src={`https://silam.fmi.fi/AQ/operational/europe/AQ/000/AQI_${formatNum(
-                                        currentNum
-                                    )}.png`}
-                                    onLoadingComplete={() =>
-                                        setCurrentNum(currentNum + 1)
-                                    }
-                                    onError={onError}
-                                    width={800}
-                                    height={1000}
-                                    alt="display-img"
-                                />
-                            </Box>
-                            <Box
-                                position="fixed"
-                                top={0}
-                                left={0}
-                                width={800}
-                                height={1000}
-                                opacity={displayImg === 4 ? 1 : 0}
-                            >
-                                <Image
-                                    priority
-                                    loading="eager"
-                                    src={`https://silam.fmi.fi/AQ/operational/europe/AQ/000/AQI_${formatNum(
-                                        currentNum
-                                    )}.png`}
-                                    onLoadingComplete={() =>
-                                        setCurrentNum(currentNum + 1)
-                                    }
-                                    onError={onError}
-                                    width={800}
-                                    height={1000}
-                                    alt="display-img"
-                                />
-                            </Box>
-                            <Box
-                                position="fixed"
-                                top={0}
-                                left={0}
-                                width={800}
-                                height={1000}
-                                opacity={displayImg === 5 ? 1 : 0}
-                            >
-                                <Image
-                                    priority
-                                    loading="eager"
-                                    src={`https://silam.fmi.fi/AQ/operational/europe/AQ/000/AQI_${formatNum(
-                                        currentNum
-                                    )}.png`}
-                                    onLoadingComplete={() =>
-                                        setCurrentNum(currentNum + 1)
-                                    }
-                                    onError={onError}
-                                    width={800}
-                                    height={1000}
-                                    alt="display-img"
-                                />
-                            </Box>
+                                alt="display-img"
+                            />
                         </Flex>
-                    )}
-                </>
+                    ))}
+                </Flex>
             )}
 
             <Box
@@ -200,12 +107,6 @@ const Home = () => {
                 p={6}
                 rounded="xl"
             >
-                {/* <Flex>{displayImg === 0 && <Spinner size="lg" />}</Flex>
-                <Flex>
-                    {currentNum}-{displayImg}&nbsp;
-                    {end ? "end" : "Chalrah"}
-                </Flex> */}
-
                 <Flex>
                     <IconButton onClick={() => setEnd(!end)} colorScheme="blue">
                         {end ? <BsFillPlayFill /> : <BsFillPauseFill />}
@@ -213,8 +114,8 @@ const Home = () => {
                     &nbsp;
                     <IconButton
                         onClick={() => {
-                            setCurrentNum(1);
-                            setDisplayImg(0);
+                            setCurrent(1);
+                            setDisplay(0);
                             setEnd(false);
                         }}
                         colorScheme="purple"
@@ -227,9 +128,9 @@ const Home = () => {
                 <Box w="25vw">
                     <Slider
                         aria-label="slider-ex-1"
-                        value={(currentNum / 121) * 100}
+                        value={(current / 120) * 100}
                         onChange={(val) => {
-                            setCurrentNum(parseInt((val / 100) * 121));
+                            setCurrent(parseInt((val / 100) * 120));
                         }}
                         onMouseEnter={() => setEnd(true)}
                         onMouseLeave={() => setEnd(false)}
