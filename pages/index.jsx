@@ -29,6 +29,8 @@ const Home = () => {
     const [speed, setSpeed] = useState(0);
     const [start, setStart] = useState();
     const mbs = 40.0187;
+    let s = new Date();
+    let e;
 
     const formatNum = (num) => {
         return num.toString().length === 1
@@ -87,7 +89,7 @@ const Home = () => {
 
         // console.log(imgListDummy);
 
-        setImgList([0, 1]);
+        setImgList([0]);
     }, [speed]);
 
     return (
@@ -160,8 +162,12 @@ const Home = () => {
                                             current + i
                                         )}.png`}
                                         onLoadingComplete={() => {
-                                            i >= display &&
-                                                setDisplay((d) => d + 1);
+                                            e = new Date();
+                                            console.log(
+                                                (e.getTime() - s.getTime()) /
+                                                    1000
+                                            );
+                                            i >= display && setDisplay(i + 1);
                                         }}
                                         onError={() => setEnd(true)}
                                         width={800}
@@ -176,7 +182,7 @@ const Home = () => {
                     <Box
                         position="fixed"
                         top="50%"
-                        right={72}
+                        right={44}
                         boxShadow="0 0 10px rgba(0, 0, 0, 0.2)"
                         p={6}
                         rounded="xl"
